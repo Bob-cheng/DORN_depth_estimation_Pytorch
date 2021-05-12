@@ -4,8 +4,8 @@ import h5py
 import os
 
 # Modify next 2 lines
-data_path = '' # where to find nyu_depth_v2_labeled.mat and splits.mat
-output_path = '' # where to put the resulting dataset
+data_path = '/data/cheng443/nyudepth' # where to find nyu_depth_v2_labeled.mat and splits.mat
+output_path = '/data/cheng443/nyudepth' # where to put the resulting dataset
 
 train_path = os.path.join(output_path, 'train/official/')
 val_path = os.path.join(output_path, 'val/official/')

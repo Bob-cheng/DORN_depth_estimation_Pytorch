@@ -137,7 +137,10 @@ class OrdinalRegressionLayer(nn.Module):
 
         softmax = softmax[:, 1, :]
         softmax = softmax.view(-1, K, H, W)
-        labels = torch.sum((softmax > 0.5), dim=1).view(-1, 1, H, W)
+        labels = torch.sum((softmax > 0.5), dim=1) 
+        # print("label1 size: ", labels.size()) # size: (3, 257, 353)
+        labels = labels.view(-1, 1, H, W)
+        # print("label2 size: ", labels.size()) # size: (3, 1, 257, 353)
         return labels, softmax
 
 

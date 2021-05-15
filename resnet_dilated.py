@@ -128,7 +128,8 @@ def resnet101dilated(pretrained=False):
         for i in saved_state_dict:
             i_parts = i.split('.')
             if not i_parts[0] == 'fc' and i.find('._') == -1:
-                new_params['.'.join(i_parts[0:])] = saved_state_dict[i]
+                # new_params['.'.join(i_parts[0:])] = saved_state_dict[i]
+                new_params[i] = saved_state_dict[i]
         
         model.load_state_dict(new_params)
         

@@ -2,6 +2,27 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 from resnet_dilated import resnet101dilated
+import os
+from datetime import datetime
+
+def save_model(model, dataset: str, pretrained: bool):
+    model_dir = os.path.join(os.path.abspath(os.curdir), 'trained_models', dataset)
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+    if pretrained:
+        postfix = 'pretrained'
+    else:
+        postfix = ''
+    model_name = '{}_{}_{}.pt'.format(dataset, datetime.now().strftime('%m_%d_%Y_%H-%M-%S'), postfix)
+    model_path = os.path.join(model_dir, model_name)
+    torch.save(model.state_dict(), model_path)
+    print('Model saved at: ', model_path)
+    return model_path
+
+def read_model(model_path, dataset: str, pretrained: bool):
+    model = DORN(dataset=dataset, pretrained=pretrained).cuda()
+    model.load_state_dict(torch.load(model_path))
+    return model
 
 
 def weights_init(model):

@@ -1,6 +1,6 @@
 import torch
 import argparse
-from model import DORN
+from model import DORN, read_model, save_model
 from data import get_dataloaders
 from loss import OrdinalLoss
 from lr_decay import PolynomialLRDecay
@@ -64,7 +64,7 @@ for epoch in range(args.epochs):
         # track performance scores
         depth = sid.labels2depth(pred_labels)
         result = Result()
-        result.evaluate(depth.data, target.data)
+        result.evaluate(depth.detach(), target.detach())
         average_meter.update(result, input.size(0))
         if i <= LOG_IMAGES:
             image_builder.add_row(input[0,:,:,:], target[0,:,:], depth[0,:,:])
@@ -102,3 +102,6 @@ for epoch in range(args.epochs):
     print()
     
 logger.close()
+
+model_path = save_model(model, args.dataset, args.pretrained)
+# loaed_model = read_model(model_path, args.dataset, args.pretrained)

@@ -3,3 +3,4 @@ pretrained/
 .vscode
 __pycache__
 .ipynb_checkpoints/
+trained_models/

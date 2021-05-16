@@ -7,6 +7,7 @@ import numpy as np
 import h5py
 import os
 import random
+from kitti_loader import KittiLoader
 
 
 class NYUDataset(Dataset):
@@ -115,8 +116,14 @@ def get_dataloaders(dataset, data_path, bs, bs_test):
         train_set = NYUDataset(os.path.join(data_path, 'train'), type='train')
         test_set = NYUDataset(os.path.join(data_path, 'val'), type='val')
     else:
-        print('Not implemented for dataset', dataset)
-        raise NotImplementedError
+        train_set = KittiLoader(root_dir=data_path, mode='train', \
+                        train_list='./list/benchmark/train_list.txt', \
+                        val_list='./list/benchmark/val_list.txt', data_limit=1000)
+        test_set = KittiLoader(root_dir=data_path, mode='test', \
+                        train_list='./list/benchmark/train_list.txt', \
+                        val_list='./list/benchmark/val_list.txt', data_limit=300)
+        # print('Not implemented for dataset', dataset)
+        # raise NotImplementedError
 
     train_loader = DataLoader(train_set, batch_size=bs, shuffle=True, num_workers=10, pin_memory=True)
     test_loader = DataLoader(test_set, batch_size=bs_test, shuffle=False, num_workers=10, pin_memory=True)

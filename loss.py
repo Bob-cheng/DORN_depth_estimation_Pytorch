@@ -17,7 +17,7 @@ class OrdinalLoss(nn.Module):
         :return:                ordinal loss
         """
         N, C, H, W = pred_softmax.size() # C - number of discrete sub-intervals (= number of channels)
-
+        # print("size of pred_softmax", pred_softmax.size())
         K = torch.zeros((N, C, H, W), dtype=torch.int).cuda()
         for i in range(C):
             K[:, i, :, :] = K[:, i, :, :] + i * torch.ones((N, H, W), dtype=torch.int).cuda()

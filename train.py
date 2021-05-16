@@ -35,7 +35,7 @@ criterion = OrdinalLoss()
 sid = SID(args.dataset)
 
 # Create logger
-log_dir = os.path.join(os.path.abspath(os.getcwd()), 'logs', datetime.now().strftime('%b%d_%H-%M-%S_') + socket.gethostname())
+log_dir = os.path.join(os.path.abspath(os.getcwd()), 'logs', datetime.now().strftime('%b%d_%H-%M-%S_') + socket.gethostname() + '_' + args.dataset)
 os.makedirs(log_dir)
 logger = SummaryWriter(log_dir)
 # Log arguments
@@ -51,11 +51,16 @@ for epoch in range(args.epochs):
     model.train()
     average_meter = AverageMeter()
     image_builder = ImageBuilder()
-    for i, (input, target) in enumerate(train_loader):
-        input, target = input.cuda(), target.cuda()
+    for i, sample in enumerate(train_loader):
+        input, target = sample[0].cuda(), sample[1].cuda()
+        if args.dataset == 'kitti':
+            target_dense = sample[2].cuda()
         
         pred_labels, pred_softmax = model(input)
-        target_labels = sid.depth2labels(target)  # get ground truth ordinal labels using SID
+        if args.dataset == 'nyu':
+            target_labels = sid.depth2labels(target)  # get ground truth ordinal labels using SID
+        elif args.dataset == 'kitti':
+            target_labels = sid.depth2labels(target_dense)  # get ground truth ordinal labels using SID
         loss = criterion(pred_softmax, target_labels)
         optimizer.zero_grad()
         loss.backward()
@@ -64,10 +69,16 @@ for epoch in range(args.epochs):
         # track performance scores
         depth = sid.labels2depth(pred_labels)
         result = Result()
-        result.evaluate(depth.detach(), target.detach())
+        if args.dataset == 'nyu':
+            result.evaluate(depth.detach(), target.detach())
+        elif args.dataset == 'kitti':
+            result.evaluate(depth.detach(), target.detach())
         average_meter.update(result, input.size(0))
         if i <= LOG_IMAGES:
-            image_builder.add_row(input[0,:,:,:], target[0,:,:], depth[0,:,:])
+            if args.dataset == 'nyu':
+                image_builder.add_row(input[0,:,:,:], target[0,:,:], depth[0,:,:])
+            elif args.dataset == 'kitti':
+                image_builder.add_row(input[0,:,:,:], target_dense[0,:,:], depth[0,:,:])
         
     # log performance scores with tensorboard
     average_meter.log(logger, epoch, 'Train')
@@ -80,19 +91,27 @@ for epoch in range(args.epochs):
     model.eval()
     average_meter = AverageMeter()
     image_builder = ImageBuilder()
-    for i, (input, target) in enumerate(val_loader):
-        input, target = input.cuda(), target.cuda()
-
+    for i, sample in enumerate(val_loader):
+        input, target = sample[0].cuda(), sample[1].cuda()
+        if args.dataset == 'kitti':
+            target_dense = sample[2].cuda()
+        
         with torch.no_grad():
             pred_labels, _ = model(input)
 
         # track performance scores
         pred = sid.labels2depth(pred_labels)
         result = Result()
-        result.evaluate(pred.data, target.data)
+        if args.dataset == 'nyu':
+            result.evaluate(pred.detach(), target.detach())
+        elif args.dataset == 'kitti':
+            result.evaluate(pred.detach(), target.detach())
         average_meter.update(result, input.size(0))
         if i <= LOG_IMAGES:
-            image_builder.add_row(input[0,:,:,:], target[0,:,:], pred[0,:,:])
+            if args.dataset == 'nyu':
+                image_builder.add_row(input[0,:,:,:], target[0,:,:], pred[0,:,:])
+            elif args.dataset == 'kitti':
+                image_builder.add_row(input[0,:,:,:], target_dense[0,:,:], pred[0,:,:])
     
     # log performance scores with tensorboard
     average_meter.log(logger, epoch, 'Test')

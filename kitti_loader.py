@@ -92,8 +92,7 @@ class KittiLoader(Dataset):
         if self.mode == 'train':
             self.filepaths = readPathFiles(root_dir, train_list)
         elif self.mode == 'val':
-            self.filepaths = readPathFiles(root_dir, val_list)
-    
+            self.filepaths = readPathFiles(root_dir, val_list)    
 
     def __len__(self):
         if self.datalimit == -1:
@@ -134,7 +133,7 @@ class KittiLoader(Dataset):
         _dense_depth = dense_depth.crop((CROP_LEFT, CROP_TOP, CROP_RIGHT, CROP_BOTTOM))
     
         transform = T.Compose([
-            T.Resize((385, CROP_RIGHT-CROP_LEFT), PIL.Image.BILINEAR), # resize x-axis, and remain y-axis
+            T.Resize((385, CROP_RIGHT-CROP_LEFT), T.InterpolationMode.BILINEAR), # resize x-axis, and remain y-axis
             T.CenterCrop(self.size),
         ])
         
@@ -174,7 +173,7 @@ class KittiLoader(Dataset):
         _dense_depth = dense_depth.crop((CROP_LEFT, CROP_TOP, CROP_RIGHT, CROP_BOTTOM))
     
         transform = T.Compose([
-            T.Resize((385, CROP_RIGHT-CROP_LEFT), PIL.Image.BILINEAR), # resize x-axis, and remain y-axis
+            T.Resize((385, CROP_RIGHT-CROP_LEFT), T.InterpolationMode.BILINEAR), # resize x-axis, and remain y-axis
             T.CenterCrop(self.size),
         ])
         

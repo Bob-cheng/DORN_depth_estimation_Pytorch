@@ -119,7 +119,7 @@ def get_dataloaders(dataset, data_path, bs, bs_test):
         train_set = KittiLoader(root_dir=data_path, mode='train', \
                         train_list='./list/benchmark/train_list.txt', \
                         val_list='./list/benchmark/val_list.txt', data_limit=1000)
-        test_set = KittiLoader(root_dir=data_path, mode='test', \
+        test_set = KittiLoader(root_dir=data_path, mode='val', \
                         train_list='./list/benchmark/train_list.txt', \
                         val_list='./list/benchmark/val_list.txt', data_limit=300)
         # print('Not implemented for dataset', dataset)

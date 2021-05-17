@@ -118,13 +118,13 @@ def get_dataloaders(dataset, data_path, bs, bs_test):
     else:
         train_set = KittiLoader(root_dir=data_path, mode='train', \
                         train_list='./list/benchmark/train_list.txt', \
-                        val_list='./list/benchmark/val_list.txt', data_limit=1000)
+                        val_list='./list/benchmark/val_list.txt', data_limit=23488)
         test_set = KittiLoader(root_dir=data_path, mode='val', \
                         train_list='./list/benchmark/train_list.txt', \
-                        val_list='./list/benchmark/val_list.txt', data_limit=300)
+                        val_list='./list/benchmark/val_list.txt', data_limit=697)
         # print('Not implemented for dataset', dataset)
         # raise NotImplementedError
-
+    print('training set size: {}, test set size: {}'.format(len(train_set), len(test_set)))
     train_loader = DataLoader(train_set, batch_size=bs, shuffle=True, num_workers=10, pin_memory=True)
     test_loader = DataLoader(test_set, batch_size=bs_test, shuffle=False, num_workers=10, pin_memory=True)
     return train_loader, test_loader

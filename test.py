@@ -7,6 +7,7 @@ def test_performace(model, val_loader, logger, dataset, LOG_IMAGES, global_steps
     sid = SID(dataset)
     model.eval()
     average_meter_eval = AverageMeter()
+    average_meter_eval_dense = AverageMeter()
     image_builder_eval = ImageBuilder()
     for i, sample in enumerate(val_loader):
         input, target = sample[0].cuda(), sample[1].cuda()
@@ -19,11 +20,16 @@ def test_performace(model, val_loader, logger, dataset, LOG_IMAGES, global_steps
         # track performance scores
         pred = sid.labels2depth(pred_labels)
         result = Result()
+        result_dense = Result()
         if dataset == 'nyu':
             result.evaluate(pred.detach(), target.detach())
+            average_meter_eval.update(result, input.size(0))
         elif dataset == 'kitti':
             result.evaluate(pred.detach(), target.detach())
-        average_meter_eval.update(result, input.size(0))
+            result_dense.evaluate(pred.detach(), target_dense.detach())
+            average_meter_eval.update(result, input.size(0))
+            average_meter_eval_dense.update(result_dense, input.size(0))
+        
         if i <= LOG_IMAGES:
             if dataset == 'nyu':
                 image_builder_eval.add_row(input[0,:,:,:], target[0,:,:], pred[0,:,:])
@@ -32,4 +38,5 @@ def test_performace(model, val_loader, logger, dataset, LOG_IMAGES, global_steps
     
     # log performance scores with tensorboard
     average_meter_eval.log(logger, global_steps, 'Test')
+    average_meter_eval_dense.log(logger, global_steps, 'Test_dense')
     logger.add_image('Test/Image', image_builder_eval.get_image(), global_steps)

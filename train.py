@@ -55,7 +55,7 @@ if args.check_point != '' and os.path.exists(args.check_point):
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     print('checkpoint loaded: ', args.check_point)
 
-lr_decay = PolynomialLRDecay(optimizer, args.epochs * 20000 // args.bs, args.lr * 1e-2)
+lr_decay = PolynomialLRDecay(optimizer, 300000, args.lr * 1e-2, power=0.9)
 criterion = OrdinalLoss()
 sid = SID(args.dataset)
 
